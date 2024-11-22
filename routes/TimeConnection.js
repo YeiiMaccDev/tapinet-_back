@@ -50,10 +50,8 @@ router.get('/', [
 ], getAllTimeConnections);
 
 // Obtener tiempos de conexión de un usuario específico
-router.get('/user/:userId', [
+router.get('/user', [
     validateJWT, // Verifica que el usuario esté autenticado
-    check('userId', 'No es un ID válido para el usuario.').isMongoId(),
-    check('userId').custom(existsUserById),
     validateFields
 ], getUserTimeConnections);
 

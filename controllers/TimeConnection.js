@@ -104,27 +104,29 @@ const getAllTimeConnections = async (req, res) => {
 
 // Obtener conexiones de un usuario específico
 const getUserTimeConnections = async (req, res) => {
-    const { userId } = req.params;
+    const { _id } = req.authenticatedUser;
 
     try {
-        const userConnections = await TimeConnection.find({ userId })
+        const userConnections = await TimeConnection.find({ userId: _id })
             .populate('userId', 'name email') // Incluye información básica del usuario
-            .select('-__v');
+            .select('-__v') // Excluye campos innecesarios
+            .sort({ createdAt: -1 }) // Ordena por la conexión más reciente
+            .limit(1); // Devuelve solo la más reciente
 
         if (!userConnections.length) {
             return res.status(404).json({
-                msg: 'No se encontraron conexiones para este usuario'
+                msg: 'No se encontraron conexiones para este usuario',
             });
         }
 
         res.json({
-            msg: 'Conexiones del usuario',
-            userConnections
+            msg: 'Última conexión del usuario',
+            userConnections,
         });
     } catch (error) {
         res.status(500).json({
             msg: 'Error al obtener las conexiones del usuario',
-            error
+            error,
         });
     }
 };
